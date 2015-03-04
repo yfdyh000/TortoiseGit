@@ -1,7 +1,6 @@
-// TortoiseCVS - a Windows shell extension for easy version control
+// TortoiseSVN - a Windows shell extension for easy version control
 
-// Copyright (C) 2000 - Francis Irving
-// <francis@flourish.org> - May 2000
+// Copyright (C) 2003, 2013-2015 - TortoiseSVN
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,9 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef LOGIN_DIALOG_H
-#define LOGIN_DIALOG_H
-
+#pragma once
 #include <windows.h>
 
 #ifdef __cplusplus
@@ -33,4 +30,3 @@ HWND GetParentHwnd();
 }
 #endif
 
-#endif

@@ -23,33 +23,33 @@ struct agent_callback {
 
 void fatalbox(char *p, ...)
 {
-	va_list ap;
-	char *stuff, morestuff[100];
-
-	va_start(ap, p);
-	stuff = dupvprintf(p, ap);
-	va_end(ap);
-	sprintf(morestuff, "%.70s Fatal Error", appname);
-	MessageBox(GetParentHwnd(), stuff, morestuff, MB_ICONERROR | MB_OK);
-	sfree(stuff);
+    va_list ap;
+    char *stuff, morestuff[100];
+    
+    va_start(ap, p);
+    stuff = dupvprintf(p, ap);
+    va_end(ap);
+    sprintf(morestuff, "%.70s Fatal Error", appname);
+    MessageBox(GetParentHwnd(), stuff, morestuff, MB_ICONERROR | MB_OK);
+    sfree(stuff);
     if (logctx) {
         log_free(logctx);
         logctx = NULL;
     }
-	cleanup_exit(1);
+    cleanup_exit(1);
 }
 void modalfatalbox(char *p, ...)
 {
-	va_list ap;
-	char *stuff, morestuff[100];
-
-	va_start(ap, p);
-	stuff = dupvprintf(p, ap);
-	va_end(ap);
-	sprintf(morestuff, "%.70s Fatal Error", appname);
-	MessageBox(GetParentHwnd(), stuff, morestuff,
-		MB_SYSTEMMODAL | MB_ICONERROR | MB_OK);
-	sfree(stuff);
+    va_list ap;
+    char *stuff, morestuff[100];
+    
+    va_start(ap, p);
+    stuff = dupvprintf(p, ap);
+    va_end(ap);
+    sprintf(morestuff, "%.70s Fatal Error", appname);
+    MessageBox(GetParentHwnd(), stuff, morestuff,
+        MB_SYSTEMMODAL | MB_ICONERROR | MB_OK);
+    sfree(stuff);
     if (logctx) {
         log_free(logctx);
         logctx = NULL;
@@ -68,36 +68,40 @@ void nonfatal(char *p, ...)
     MessageBox(GetParentHwnd(), stuff, morestuff,
         MB_SYSTEMMODAL | MB_ICONERROR | MB_OK);
     sfree(stuff);
-}
-void connection_fatal(void *frontend, char *p, ...)
-{
-    va_list ap;
-	char *stuff, morestuff[100];
-
-	va_start(ap, p);
-	stuff = dupvprintf(p, ap);
-	va_end(ap);
-	sprintf(morestuff, "%.70s Fatal Error", appname);
-	MessageBox(GetParentHwnd(), stuff, morestuff,
-		MB_SYSTEMMODAL | MB_ICONERROR | MB_OK);
-	sfree(stuff);
     if (logctx) {
         log_free(logctx);
         logctx = NULL;
     }
-	cleanup_exit(1);
+}
+void connection_fatal(void *frontend, char *p, ...)
+{
+    va_list ap;
+    char *stuff, morestuff[100];
+    
+    va_start(ap, p);
+    stuff = dupvprintf(p, ap);
+    va_end(ap);
+    sprintf(morestuff, "%.70s Fatal Error", appname);
+    MessageBox(GetParentHwnd(), stuff, morestuff,
+        MB_SYSTEMMODAL | MB_ICONERROR | MB_OK);
+    sfree(stuff);
+    if (logctx) {
+        log_free(logctx);
+        logctx = NULL;
+    }
+    cleanup_exit(1);
 }
 void cmdline_error(char *p, ...)
 {
-	va_list ap;
-	char *stuff, morestuff[100];
-
-	va_start(ap, p);
-	stuff = dupvprintf(p, ap);
-	va_end(ap);
-	sprintf(morestuff, "%.70s Command Line Error", appname);
-	MessageBox(GetParentHwnd(), stuff, morestuff, MB_ICONERROR | MB_OK);
-	sfree(stuff);
+    va_list ap;
+    char *stuff, morestuff[100];
+    
+    va_start(ap, p);
+    stuff = dupvprintf(p, ap);
+    va_end(ap);
+    sprintf(morestuff, "%.70s Command Line Error", appname);
+    MessageBox(GetParentHwnd(), stuff, morestuff, MB_ICONERROR | MB_OK);
+    sfree(stuff);
     exit(1);
 }
 
@@ -190,12 +194,12 @@ void agent_schedule_callback(void (*callback)(void *, void *, int),
  */
 static void usage(void)
 {
-	char buf[10000];
-	int j = 0;
+    char buf[10000];
+    int j = 0;
 
-	j += sprintf(buf+j, "TortoiseGitPlink: command-line connection utility (based on PuTTY Plink)\n");
+    j += sprintf(buf+j, "Plink: command-line connection utility\n");
     j += sprintf(buf+j, "%s\n", ver);
-    j += sprintf(buf+j, "Usage: tortoisegitplink [options] [user@]host [command]\n");
+    j += sprintf(buf+j, "Usage: plink [options] [user@]host [command]\n");
     j += sprintf(buf+j, "       (\"host\" can also be a PuTTY saved session name)\n");
     j += sprintf(buf+j, "Options:\n");
     j += sprintf(buf+j, "  -V        print version information and exit\n");
@@ -206,6 +210,7 @@ static void usage(void)
     j += sprintf(buf+j, "            force use of a particular protocol\n");
     j += sprintf(buf+j, "  -P port   connect to specified port\n");
     j += sprintf(buf+j, "  -l user   connect with specified username\n");
+    j += sprintf(buf+j, "  -batch    disable all interactive prompts\n");
     j += sprintf(buf+j, "  -sercfg configuration-string (e.g. 19200,8,n,1,X)\n");
     j += sprintf(buf+j, "            Specify the serial configuration (serial only)\n");
     j += sprintf(buf+j, "The following options only apply to SSH connections:\n");
@@ -232,14 +237,14 @@ static void usage(void)
     j += sprintf(buf+j, "  -N        don't start a shell/command (SSH-2 only)\n");
     j += sprintf(buf+j, "  -nc host:port\n");
     j += sprintf(buf+j, "            open tunnel in place of session (SSH-2 only)\n");
-	MessageBox(NULL, buf, "TortoiseGitPlink", MB_ICONINFORMATION);
-	exit(1);
+    MessageBox(NULL, buf, "TortoisePlink", MB_ICONINFORMATION);
+    exit(1);
 }
 
 static void version(void)
 {
-	printf("TortoiseGitPlink: %s\n", ver);
-	exit(1);
+    printf("TortoisePlink: %s\n", ver);
+    exit(1);
 }
 
 char *do_select(SOCKET skt, int startup)
@@ -342,11 +347,24 @@ int main(int argc, char **argv)
     conf = conf_new();
     do_defaults(NULL, conf);
     loaded_session = FALSE;
+    default_protocol = conf_get_int(conf, CONF_protocol);
+    default_port = conf_get_int(conf, CONF_port);
     errors = 0;
-    conf_set_int(conf, CONF_protocol, default_protocol);
-    conf_set_int(conf, CONF_port, default_port);
-    conf_set_int(conf, CONF_agentfwd, 0);
-    conf_set_int(conf, CONF_x11_forward, 0);
+    {
+	/*
+	 * Override the default protocol if PLINK_PROTOCOL is set.
+	 */
+	char *p = getenv("PLINK_PROTOCOL");
+	if (p) {
+	    const Backend *b = backend_from_name(p);
+	    if (b) {
+		default_protocol = b->protocol;
+		default_port = b->default_port;
+		conf_set_int(conf, CONF_protocol, default_protocol);
+		conf_set_int(conf, CONF_port, default_port);
+	    }
+	}
+    }
     while (--argc) {
 	char *p = *++argv;
 	if (*p == '-') {
@@ -354,14 +372,14 @@ int main(int argc, char **argv)
 					    1, conf);
 	    if (ret == -2) {
 		fprintf(stderr,
-			"tortoisegitplink: option \"%s\" requires an argument\n", p);
+			"plink: option \"%s\" requires an argument\n", p);
 		errors = 1;
 	    } else if (ret == 2) {
 		--argc, ++argv;
 	    } else if (ret == 1) {
 		continue;
 	    } else if (!strcmp(p, "-batch")) {
-			// ignore and do not print an error message
+		console_batch_mode = 1;
 	    } else if (!strcmp(p, "-s")) {
 		/* Save status to write to conf later. */
 		use_subsystem = 1;
@@ -373,7 +391,7 @@ int main(int argc, char **argv)
                 pgp_fingerprints();
                 exit(1);
 	    } else {
-		fprintf(stderr, "tortoisegitplink: unknown option \"%s\"\n", p);
+		fprintf(stderr, "plink: unknown option \"%s\"\n", p);
 		errors = 1;
 	    }
 	} else if (*p) {
@@ -786,9 +804,4 @@ int main(int argc, char **argv)
     }
     cleanup_exit(exitcode);
     return 0;			       /* placate compiler warning */
-}
-
-int WinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow)
-{
-	main(__argc,__argv);
 }

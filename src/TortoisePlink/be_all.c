@@ -1,6 +1,6 @@
 /*
  * Linking module for PuTTY proper: list the available backends
- * including ssh, plus the serial backend.
+ * including ssh.
  */
 
 #include <stdio.h>
@@ -27,6 +27,5 @@ Backend *backends[] = {
     &telnet_backend,
     &rlogin_backend,
     &raw_backend,
-    &serial_backend,
     NULL
 };

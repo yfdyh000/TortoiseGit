@@ -52,6 +52,8 @@ int verify_ssh_host_key(void *frontend, char *host, int port, char *keytype,
                         void (*callback)(void *ctx, int result), void *ctx)
 {
     int ret;
+    HANDLE hin;
+    DWORD savemode, i;
 
     static const char absentmsg_batch[] =
 	"The server's host key is not cached in the registry. You\n"
@@ -66,12 +68,13 @@ int verify_ssh_host_key(void *frontend, char *host, int port, char *keytype,
 	"think it is.\n"
 	"The server's %s key fingerprint is:\n"
 	"%s\n"
-	"If you trust this host, hit Yes to add the key to\n"
+	"If you trust this host, enter \"y\" to add the key to\n"
 	"PuTTY's cache and carry on connecting.\n"
 	"If you want to carry on connecting just once, without\n"
-	"adding the key to the cache, hit No.\n"
-	"If you do not trust this host, hit Cancel to abandon the\n"
-	"connection.\n";
+	"adding the key to the cache, enter \"n\".\n"
+	"If you do not trust this host, press Return to abandon the\n"
+	"connection.\n"
+	"Store key in cache? (y/n) ";
 
     static const char wrongmsg_batch[] =
 	"WARNING - POTENTIAL SECURITY BREACH!\n"
@@ -85,7 +88,6 @@ int verify_ssh_host_key(void *frontend, char *host, int port, char *keytype,
 	"Connection abandoned.\n";
     static const char wrongmsg[] =
 	"WARNING - POTENTIAL SECURITY BREACH!\n"
-	"\n"
 	"The server's host key does not match the one PuTTY has\n"
 	"cached in the registry. This means that either the\n"
 	"server administrator has changed the host key, or you\n"
@@ -94,14 +96,17 @@ int verify_ssh_host_key(void *frontend, char *host, int port, char *keytype,
 	"The new %s key fingerprint is:\n"
 	"%s\n"
 	"If you were expecting this change and trust the new key,\n"
-	"hit Yes to update PuTTY's cache and continue connecting.\n"
+	"enter \"y\" to update PuTTY's cache and continue connecting.\n"
 	"If you want to carry on connecting but without updating\n"
-	"the cache, hit No.\n"
-	"If you want to abandon the connection completely, hit\n"
-	"Cancel. Hitting Cancel is the ONLY guaranteed safe\n" "choice.\n";
+	"the cache, enter \"n\".\n"
+	"If you want to abandon the connection completely, press\n"
+	"Return to cancel. Pressing Return is the ONLY guaranteed\n"
+	"safe choice.\n"
+	"Update cached key? (y/n, Return cancels connection) ";
 
     static const char abandoned[] = "Connection abandoned.\n";
 
+    char line[32];
 	static const char mbtitle[] = "%s Security Alert";
 
     /*
@@ -116,7 +121,7 @@ int verify_ssh_host_key(void *frontend, char *host, int port, char *keytype,
 	int mbret;
 	char *message, *title;
 
-	message = dupprintf(wrongmsg, keytype, fingerprint);
+	message = dupprintf(wrongmsg, keytype, fingerprint, appname);
 	title = dupprintf(mbtitle, appname);
 
 	mbret = MessageBox(GetParentHwnd(), message, title, MB_ICONWARNING | MB_YESNOCANCEL | MB_DEFBUTTON3);
@@ -133,11 +138,10 @@ int verify_ssh_host_key(void *frontend, char *host, int port, char *keytype,
 	else
 		return 0;
 	}
-
     if (ret == 1) {		       /* key was absent */
 	int mbret;
 	char *message, *title;
-	message = dupprintf(absentmsg, keytype, fingerprint);
+	message = dupprintf(absentmsg, keytype, fingerprint, appname);
 	title = dupprintf(mbtitle, appname);
 	mbret = MessageBox(GetParentHwnd(), message, title,
 		MB_ICONWARNING | MB_ICONWARNING | MB_YESNOCANCEL | MB_DEFBUTTON3);
@@ -173,6 +177,11 @@ int askalg(void *frontend, const char *algtype, const char *algname,
 	"The first %s supported by the server is\n"
 	"%s, which is below the configured warning threshold.\n"
 	"Continue with connection? (y/n) ";
+    static const char msg_batch[] =
+	"The first %s supported by the server is\n"
+	"%s, which is below the configured warning threshold.\n"
+	"Connection abandoned.\n";
+    static const char abandoned[] = "Connection abandoned.\n";
 
 	static const char mbtitle[] = "%s Security Alert";
 
@@ -300,6 +309,7 @@ static void console_data_untrusted(HANDLE hout, const char *data, int len)
 
 int console_get_userpass_input(prompts_t *p, unsigned char *in, int inlen)
 {
+    HANDLE hin, hout;
     size_t curr_prompt;
 
     /*
@@ -314,16 +324,15 @@ int console_get_userpass_input(prompts_t *p, unsigned char *in, int inlen)
     if (console_batch_mode)
 	return 0;
 
-
     for (curr_prompt = 0; curr_prompt < p->n_prompts; curr_prompt++) {
-		
+
 	prompt_t *pr = p->prompts[curr_prompt];
 	if (!DoLoginDialog(pr->result, pr->resultsize-1, pr->prompt))
 	return 0;
+    
     }
 
     return 1; /* success */
-
 }
 
 void frontend_keypress(void *handle)
